@@ -1,0 +1,147 @@
+/* index.css — styling for the whole app, designed mobile-first. */
+
+/* Make width/height include padding and borders (easier sizing) */
+* {
+  box-sizing: border-box;
+}
+
+/* Page basics: system font (looks native on iPhone and Samsung), soft background */
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #f6f5f2;
+  color: #222;
+}
+
+/* Centered column, comfortable on phones and not too wide on laptops */
+main {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+h1 {
+  font-size: 1.6rem;
+  margin: 8px 0 16px;
+  text-align: center;
+}
+
+/* ---------- Add forms (new list / new item) ---------- */
+
+/* Input and Add button side by side */
+form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+form input {
+  flex: 1; /* input takes all space the button doesn't */
+  padding: 12px;
+  font-size: 16px; /* 16px or more stops iPhone zooming in when you tap the input */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+/* ---------- Buttons ---------- */
+
+button {
+  padding: 12px 16px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  background: #2f6f4f;
+  color: white;
+  cursor: pointer;
+}
+
+/* Clear outline when navigating with a keyboard */
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid #2f6f4f;
+  outline-offset: 2px;
+}
+
+/* ---------- Rows (lists on the overview, items on the detail screen) ---------- */
+
+/* Remove default bullet points and indentation */
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Each row: white card, content on the left, ✕ on the right */
+li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+/* Item rows: checkbox + name, whole label is tappable */
+li label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  font-size: 17px;
+}
+
+/* Bigger checkbox, easier to hit with a thumb */
+li input[type='checkbox'] {
+  width: 22px;
+  height: 22px;
+}
+
+/* Bought items: strike-through and greyed out */
+li.bought label {
+  text-decoration: line-through;
+  color: #999;
+}
+
+/* ---------- Overview screen ---------- */
+
+/* The list name row looks like text, not like a green button */
+.list-link {
+  flex: 1; /* take the row's space, leaving room for the ✕ */
+  display: flex;
+  justify-content: space-between;
+  background: none;
+  color: inherit;
+  padding: 0;
+  font-size: 17px;
+  text-align: left;
+}
+
+/* "3 left" counter */
+.count {
+  color: #888;
+  font-size: 14px;
+}
+
+/* ---------- Small helpers ---------- */
+
+/* "← Lists" back link */
+.back {
+  background: none;
+  color: #2f6f4f;
+  padding: 8px 0;
+}
+
+/* Grey ✕ delete buttons */
+.delete {
+  background: none;
+  color: #aaa;
+  padding: 4px 8px;
+}
+
+/* "No lists yet" / "This list is empty" messages */
+.empty {
+  color: #888;
+  text-align: center;
+}
