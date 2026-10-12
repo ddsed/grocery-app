@@ -1,8 +1,10 @@
 // ListScreen.jsx — one list's items, live from Firestore.
 // Add items (with autocomplete), tick them as bought, delete them.
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useEntries, useCatalog, addItem, toggleBought, deleteItem } from './data';
+import EmojiRain from './EmojiRain';
+import { findEmoji, makeDrops, RAIN_DURATION } from './emojis';
 
 export default function ListScreen({ list, onBack }) {
   // Live data: this list's entries, and every item name ever used
@@ -11,6 +13,30 @@ export default function ListScreen({ list, onBack }) {
 
   // What's typed in the "add item" box (controlled input)
   const [name, setName] = useState('');
+
+  // The current emoji rain: { id, emoji, drops }, or null when it's not raining
+  const [rain, setRain] = useState(null);
+
+  // Remembers the "stop raining" timer, so a new rain can cancel the old one
+  const rainTimer = useRef(null);
+
+  // Tick / untick, and start a rain when an item is ticked as bought
+  function handleToggle(entry) {
+    toggleBought(list.id, entry);
+
+    // Only celebrate when ticking ON, not when unticking
+    if (entry.bought) return;
+
+    const emoji = findEmoji(entry.name);
+    if (!emoji) return; // no matching emoji -> no rain
+
+    // New id restarts the animation even if it's already raining
+    setRain({ id: Date.now(), emoji, drops: makeDrops() });
+
+    // Stop the rain after it has finished falling
+    clearTimeout(rainTimer.current);
+    rainTimer.current = setTimeout(() => setRain(null), RAIN_DURATION);
+  }
 
   // Runs on Add button or Enter key
   function handleSubmit(e) {
@@ -68,7 +94,7 @@ export default function ListScreen({ list, onBack }) {
               <input
                 type="checkbox"
                 checked={entry.bought}
-                onChange={() => toggleBought(list.id, entry)}
+                onChange={() => handleToggle(entry)}
               />
               {entry.name}
             </label>
@@ -84,6 +110,8 @@ export default function ListScreen({ list, onBack }) {
           </li>
         ))}
       </ul>
+      {/* Emoji rain overlay; key makes React restart it for each new rain */}
+      {rain && <EmojiRain key={rain.id} emoji={rain.emoji} drops={rain.drops} />}
     </main>
   );
 }

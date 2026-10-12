@@ -167,3 +167,36 @@ li.bought label {
   text-align: center;
   margin-top: 32px;
 }
+
+/* ---------- Emoji rain ---------- */
+
+/* Full-screen layer on top of everything; taps pass through it */
+.emoji-rain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 10;
+}
+
+/* Each emoji starts just above the screen and falls down */
+.emoji-rain span {
+  position: absolute;
+  top: -10vh;
+  animation-name: emoji-fall;
+  animation-timing-function: ease-in; /* speeds up like real falling */
+  animation-fill-mode: both;
+}
+
+@keyframes emoji-fall {
+  to {
+    transform: translateY(120vh) rotate(360deg);
+  }
+}
+
+/* People who turned on "Reduce motion" on their phone get no rain */
+@media (prefers-reduced-motion: reduce) {
+  .emoji-rain {
+    display: none;
+  }
+}
