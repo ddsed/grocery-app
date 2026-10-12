@@ -24,8 +24,8 @@ export default function SignIn() {
 
   return (
     <main className="signin">
-      <h1>🛒 Our Groceries</h1>
-      <button onClick={handleSignIn}>Sign in with Google</button>
+      <h1>D&D Groceries</h1>
+      <button onClick={handleSignIn}>Confirm being my PARTNER</button>
       {error && <p className="error">{error}</p>}
     </main>
   );

@@ -1,5 +1,11 @@
+// firebase.js — connects the app to your Firebase project.
+
 import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
+import {
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
@@ -12,5 +18,15 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+
+// Firestore with OFFLINE support:
+// - persistentLocalCache keeps a copy of your lists on the device,
+//   so the app shows data and accepts changes without internet
+// - changes made offline are queued and synced automatically once back online
+// - persistentMultipleTabManager lets several open tabs share that copy safely
+export const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+});
+
+// Sign-in. Firebase remembers the login on the device, also offline.
 export const auth = getAuth(app);
