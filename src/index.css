@@ -200,3 +200,42 @@ li.bought label {
     display: none;
   }
 }
+
+/* ---------- Custom sticker ---------- */
+
+/* The list area becomes the reference point for positioning the sticker */
+.list-area {
+  position: relative;
+}
+
+/* Sits on top of the list, centered horizontally, at the top of the list;
+   taps pass through it to the items underneath */
+.sticker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.sticker img {
+  width: min(45vw, 180px);
+  animation: sticker-spin-grow 2s ease-out both;
+}
+
+/* Spin one full circle while growing from 0 to full size,
+   hold for a moment, then fade out */
+@keyframes sticker-spin-grow {
+  0%   { transform: scale(0) rotate(0deg);   opacity: 0; }
+  60%  { transform: scale(1) rotate(360deg); opacity: 1; }
+  85%  { transform: scale(1) rotate(360deg); opacity: 1; }
+  100% { transform: scale(1) rotate(360deg); opacity: 0; }
+}
+
+/* "Reduce motion" on: show the sticker without spinning */
+@media (prefers-reduced-motion: reduce) {
+  .sticker img { animation: none; }
+}
