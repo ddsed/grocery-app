@@ -145,3 +145,25 @@ li.bought label {
   color: #888;
   text-align: center;
 }
+
+/* ---------- Sign-in ---------- */
+
+/* Center the sign-in screen's content */
+.signin {
+  text-align: center;
+  padding-top: 25vh;
+}
+
+/* Sign-in error message */
+.error {
+  color: #b3261e;
+  font-size: 14px;
+}
+
+/* "Signed in as ..." line at the bottom of the overview */
+.signed-in {
+  color: #888;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 32px;
+}

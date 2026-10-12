@@ -1,35 +1,31 @@
-// ListScreen.jsx — the detail screen for ONE shopping list.
-// Lets you add items (with autocomplete from the catalog),
-// tick them as bought, and delete them.
-// Like ListsScreen, it holds no list data itself: it gets everything via
-// props from App.jsx and reports changes back through the on... functions.
+// ListScreen.jsx — one list's items, live from Firestore.
+// Add items (with autocomplete), tick them as bought, delete them.
 
 import { useState } from 'react';
+import { useEntries, useCatalog, addItem, toggleBought, deleteItem } from './data';
 
-export default function ListScreen({
-  list, // the open list: { id, name, items: [...] }
-  catalog, // every item name ever added, for autocomplete
-  onBack, // go back to the overview
-  onAddItem, // add (or reuse) an item by name
-  onToggleBought, // tick / untick an item by id
-  onDeleteItem, // remove an item by id
-}) {
-  // What's currently typed in the "add item" box (controlled input)
+export default function ListScreen({ list, onBack }) {
+  // Live data: this list's entries, and every item name ever used
+  const entries = useEntries(list.id);
+  const catalog = useCatalog();
+
+  // What's typed in the "add item" box (controlled input)
   const [name, setName] = useState('');
 
-  // Runs when the form is submitted (Add button or Enter key)
+  // Runs on Add button or Enter key
   function handleSubmit(e) {
-    e.preventDefault(); // stop the browser from reloading the page
+    e.preventDefault(); // stop the page from reloading
     if (!name.trim()) return; // ignore empty input
-    onAddItem(name); // App.jsx normalizes it and handles duplicates
-    setName(''); // clear the box for the next item
+    addItem(list.id, name); // data.js normalizes and handles duplicates
+    setName(''); // clear right away; no need to wait for the server
   }
 
-  // Sort so unbought items come first and bought ones sink to the bottom.
-  // In JavaScript, true - false = 1 and false - true = -1, so this works on booleans.
-  // [...list.items] makes a copy first, because sort() would otherwise
-  // change the original array (and we never change state directly).
-  const sortedItems = [...list.items].sort((a, b) => a.bought - b.bought);
+  // Order: unbought first, bought at the bottom; within each group, oldest first.
+  // [...entries] copies the array, because sort() changes the array it's given.
+  // true - false = 1, so subtracting booleans pushes bought items down.
+  const sorted = [...entries].sort(
+    (a, b) => a.bought - b.bought || a.addedAt - b.addedAt
+  );
 
   return (
     <main>
@@ -41,7 +37,7 @@ export default function ListScreen({
       <h1>{list.name}</h1>
 
       {/* Form to add an item.
-          list="item-suggestions" connects the input to the <datalist> below,
+          list="item-suggestions" links the input to the <datalist> below,
           so the browser suggests names you've used before.
           autoCapitalize="none" stops phone keyboards capitalizing the first letter. */}
       <form onSubmit={handleSubmit}>
@@ -60,29 +56,28 @@ export default function ListScreen({
         <button type="submit">Add</button>
       </form>
 
-      {/* Empty state, shown only when the list has no items */}
-      {list.items.length === 0 && <p className="empty">This list is empty. Add an item above.</p>}
+      {/* Empty state */}
+      {entries.length === 0 && <p className="empty">This list is empty. Add an item above.</p>}
 
-      {/* One row per item. The "bought" class adds the strike-through styling. */}
+      {/* One row per item; "bought" class adds the strike-through */}
       <ul>
-        {sortedItems.map((item) => (
-          <li key={item.id} className={item.bought ? 'bought' : ''}>
-            {/* Wrapping the checkbox AND the name in a <label> makes the
-                whole row text tappable, not just the small checkbox */}
+        {sorted.map((entry) => (
+          <li key={entry.id} className={entry.bought ? 'bought' : ''}>
+            {/* The label makes the whole name tappable, not just the checkbox */}
             <label>
               <input
                 type="checkbox"
-                checked={item.bought}
-                onChange={() => onToggleBought(item.id)}
+                checked={entry.bought}
+                onChange={() => toggleBought(list.id, entry)}
               />
-              {item.name}
+              {entry.name}
             </label>
 
-            {/* Delete button for this item */}
+            {/* Remove this item from the list (it stays in autocomplete) */}
             <button
               className="delete"
-              onClick={() => onDeleteItem(item.id)}
-              aria-label={`Delete ${item.name}`}
+              onClick={() => deleteItem(list.id, entry.id)}
+              aria-label={`Delete ${entry.name}`}
             >
               ✕
             </button>
