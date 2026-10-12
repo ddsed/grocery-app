@@ -1,16 +1,47 @@
-/* index.css — styling for the whole app, designed mobile-first. */
+/* index.css — rainbow theme, mobile-first.
+   All colors live in the variables below: change them here to restyle the app. */
+
+:root {
+  /* Bright rainbow: buttons, headings, row borders */
+  --rainbow: linear-gradient(
+    90deg,
+    #ff4d6d, #ff922b, #fcc419, #51cf66, #339af0, #845ef7, #f06595
+  );
+
+  /* Soft pastel rainbow: page background (light, so text stays readable) */
+  --rainbow-soft: linear-gradient(
+    160deg,
+    #ffe3e3, #fff0db, #fff9db, #e6fcf5, #e7f5ff, #f3f0ff, #fff0f6
+  );
+
+  --text: #222;
+  --muted: #888;
+  --card: #ffffff;
+  --accent: #845ef7; /* purple: links, checkboxes, focus outlines */
+}
 
 /* Make width/height include padding and borders (easier sizing) */
 * {
   box-sizing: border-box;
 }
 
-/* Page basics: system font (looks native on iPhone and Samsung), soft background */
+/* Page basics: system font (looks native on iPhone and Samsung) */
 body {
   margin: 0;
   font-family: system-ui, -apple-system, sans-serif;
-  background: #f6f5f2;
-  color: #222;
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* Pastel rainbow background that stays put while scrolling.
+   (A fixed pseudo-element instead of background-attachment: fixed,
+   which iPhone Safari ignores.) */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--rainbow-soft);
 }
 
 /* Centered column, comfortable on phones and not too wide on laptops */
@@ -20,10 +51,16 @@ main {
   padding: 16px;
 }
 
+/* Headings in rainbow text: the gradient is painted behind the text
+   and "clipped" to the letter shapes */
 h1 {
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   margin: 8px 0 16px;
   text-align: center;
+  background: var(--rainbow);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 /* ---------- Add forms (new list / new item) ---------- */
@@ -35,30 +72,38 @@ form {
   margin-bottom: 16px;
 }
 
+/* Input with a rainbow border:
+   white fill on the inner box, rainbow on the border area */
 form input {
-  flex: 1; /* input takes all space the button doesn't */
+  flex: 1;
   padding: 12px;
   font-size: 16px; /* 16px or more stops iPhone zooming in when you tap the input */
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  background:
+    linear-gradient(var(--card), var(--card)) padding-box,
+    var(--rainbow) border-box;
 }
 
 /* ---------- Buttons ---------- */
 
+/* Rainbow buttons; the text shadow keeps white text readable on yellow */
 button {
   padding: 12px 16px;
   font-size: 16px;
+  font-weight: 600;
   border: none;
-  border-radius: 8px;
-  background: #2f6f4f;
+  border-radius: 10px;
+  background: var(--rainbow);
   color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
   cursor: pointer;
 }
 
 /* Clear outline when navigating with a keyboard */
 button:focus-visible,
 input:focus-visible {
-  outline: 2px solid #2f6f4f;
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -71,16 +116,19 @@ ul {
   margin: 0;
 }
 
-/* Each row: white card, content on the left, ✕ on the right */
+/* Each row: white card with a rainbow border, content left, ✕ right */
 li {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  background: white;
-  border-radius: 8px;
   padding: 12px;
   margin-bottom: 8px;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  background:
+    linear-gradient(var(--card), var(--card)) padding-box,
+    var(--rainbow) border-box;
 }
 
 /* Item rows: checkbox + name, whole label is tappable */
@@ -92,13 +140,20 @@ li label {
   font-size: 17px;
 }
 
-/* Bigger checkbox, easier to hit with a thumb */
+/* Bigger checkbox in the accent color, easier to hit with a thumb */
 li input[type='checkbox'] {
   width: 22px;
   height: 22px;
+  accent-color: var(--accent);
 }
 
-/* Bought items: strike-through and greyed out */
+/* Bought items: plain grey border, strike-through, greyed out */
+li.bought {
+  background:
+    linear-gradient(var(--card), var(--card)) padding-box,
+    linear-gradient(#ddd, #ddd) border-box;
+}
+
 li.bought label {
   text-decoration: line-through;
   color: #999;
@@ -106,13 +161,15 @@ li.bought label {
 
 /* ---------- Overview screen ---------- */
 
-/* The list name row looks like text, not like a green button */
+/* The list name row looks like text, not like a rainbow button */
 .list-link {
-  flex: 1; /* take the row's space, leaving room for the ✕ */
+  flex: 1;
   display: flex;
   justify-content: space-between;
   background: none;
   color: inherit;
+  text-shadow: none;
+  font-weight: normal;
   padding: 0;
   font-size: 17px;
   text-align: left;
@@ -120,16 +177,17 @@ li.bought label {
 
 /* "3 left" counter */
 .count {
-  color: #888;
+  color: var(--muted);
   font-size: 14px;
 }
 
 /* ---------- Small helpers ---------- */
 
-/* "← Lists" back link */
+/* "← Lists" back link and "Sign out" */
 .back {
   background: none;
-  color: #2f6f4f;
+  color: var(--accent);
+  text-shadow: none;
   padding: 8px 0;
 }
 
@@ -137,24 +195,23 @@ li.bought label {
 .delete {
   background: none;
   color: #aaa;
+  text-shadow: none;
   padding: 4px 8px;
 }
 
 /* "No lists yet" / "This list is empty" messages */
 .empty {
-  color: #888;
+  color: var(--muted);
   text-align: center;
 }
 
 /* ---------- Sign-in ---------- */
 
-/* Center the sign-in screen's content */
 .signin {
   text-align: center;
   padding-top: 25vh;
 }
 
-/* Sign-in error message */
 .error {
   color: #b3261e;
   font-size: 14px;
@@ -162,7 +219,7 @@ li.bought label {
 
 /* "Signed in as ..." line at the bottom of the overview */
 .signed-in {
-  color: #888;
+  color: var(--muted);
   font-size: 14px;
   text-align: center;
   margin-top: 32px;
@@ -184,20 +241,13 @@ li.bought label {
   position: absolute;
   top: -10vh;
   animation-name: emoji-fall;
-  animation-timing-function: ease-in; /* speeds up like real falling */
+  animation-timing-function: ease-in;
   animation-fill-mode: both;
 }
 
 @keyframes emoji-fall {
   to {
     transform: translateY(120vh) rotate(360deg);
-  }
-}
-
-/* People who turned on "Reduce motion" on their phone get no rain */
-@media (prefers-reduced-motion: reduce) {
-  .emoji-rain {
-    display: none;
   }
 }
 
@@ -208,8 +258,7 @@ li.bought label {
   position: relative;
 }
 
-/* Sits on top of the list, centered horizontally, at the top of the list;
-   taps pass through it to the items underneath */
+/* On top of the list, centered horizontally; taps pass through */
 .sticker {
   position: absolute;
   top: 0;
@@ -226,8 +275,7 @@ li.bought label {
   animation: sticker-spin-grow 2s ease-out both;
 }
 
-/* Spin one full circle while growing from 0 to full size,
-   hold for a moment, then fade out */
+/* Spin one full circle while growing, hold, then fade out */
 @keyframes sticker-spin-grow {
   0%   { transform: scale(0) rotate(0deg);   opacity: 0; }
   60%  { transform: scale(1) rotate(360deg); opacity: 1; }
@@ -235,7 +283,10 @@ li.bought label {
   100% { transform: scale(1) rotate(360deg); opacity: 0; }
 }
 
-/* "Reduce motion" on: show the sticker without spinning */
+/* ---------- Reduce motion ---------- */
+
+/* People who turned on "Reduce motion" get no rain and a still sticker */
 @media (prefers-reduced-motion: reduce) {
+  .emoji-rain { display: none; }
   .sticker img { animation: none; }
 }
