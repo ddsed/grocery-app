@@ -32,7 +32,7 @@ export default function ListsScreen({ user, onOpenList }) {
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="new list, e.g. snackish mood"
+          placeholder="new list, e.g. snackishhh mood"
           autoCapitalize="none"
         />
         <button type="submit">Add</button>

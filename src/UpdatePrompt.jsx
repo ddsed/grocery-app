@@ -2,14 +2,18 @@
 //
 // How it works: the installed app keeps a stored copy of itself (so it can
 // start offline). After a deploy, the phone downloads the new version in the
-// background, and this banner asks you to switch to it.
+// background ("waiting"), and this banner asks you to switch to it.
 
+import { useState } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
 export default function UpdatePrompt() {
+  // True while switching to the new version, so the button can show "Updating…"
+  const [updating, setUpdating] = useState(false);
+
   const {
     needRefresh: [needRefresh, setNeedRefresh], // true when a new version is ready
-    updateServiceWorker, // switches to the new version and reloads
+    updateServiceWorker, // activates the new version
   } = useRegisterSW({
     // Check for a new version every time the app comes back to the screen
     // (phones often resume the app instead of starting it fresh)
@@ -21,13 +25,33 @@ export default function UpdatePrompt() {
     },
   });
 
+  async function handleRefresh() {
+    setUpdating(true);
+
+    // When the new version takes over, reload the page so it actually runs
+    navigator.serviceWorker?.addEventListener('controllerchange', () => {
+      window.location.reload();
+    });
+
+    try {
+      // Tell the waiting new version to take over
+      await updateServiceWorker(true);
+    } finally {
+      // Safety net: some phones (especially installed iPhone apps) never fire
+      // the "took over" event, so reload ourselves after a short moment
+      setTimeout(() => window.location.reload(), 1500);
+    }
+  }
+
   // Nothing to show until a new version is ready
   if (!needRefresh) return null;
 
   return (
     <div className="update-banner" role="status">
       <span>New version available</span>
-      <button onClick={() => updateServiceWorker(true)}>Refresh</button>
+      <button onClick={handleRefresh} disabled={updating}>
+        {updating ? 'Updating…' : 'Refresh'}
+      </button>
       <button className="back" onClick={() => setNeedRefresh(false)}>
         Later
       </button>
